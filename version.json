@@ -1,0 +1,7 @@
+{
+  "version": "1.0.0",
+  "name": "Faceit Extensions",
+  "updateUrl": "https://raw.githubusercontent.com/KreziBro/faceit-extensions/main/version.json",
+  "zipUrl": "https://github.com/KreziBro/faceit-extensions/archive/refs/heads/main.zip",
+  "changelog": "Релиз Faceit Extensions 1.0.0"
+}

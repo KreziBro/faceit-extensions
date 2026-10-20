@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faceit Extensions</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Play:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-window: #121212;
+            --bg-settings: #060606;
+            --bg-sidebar: #121212;
+            --bg-card: #0F1013;
+            --bg-card-hover: #15161A;
+            --bg-input: #0A0B0D;
+            --border-main: #1C1E23;
+            --border-subtle: #141518;
+            --border-focus: #FF5500;
+            --accent-orange: #FF5500;
+            --accent-orange-hover: #FF6E26;
+            --accent-orange-dark: #CC4400;
+            --accent-orange-glow: rgba(255, 85, 0, 0.28);
+            --text-primary: #FFFFFF;
+            --text-secondary: #9094A0;
+            --text-muted: #555865;
+            --status-green: #00B359;
+            --font-display: 'Play', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-body);
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-window);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Minimal Scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #25272F;
+            border-radius: 2px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-orange);
+        }
+
+        /* FACEIT CUSTOM TITLEBAR */
+        .titlebar {
+            height: 38px;
+            background: var(--bg-window);
+            border-bottom: 1px solid var(--border-main);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 10px 0 14px;
+            -webkit-app-region: drag;
+            flex-shrink: 0;
+        }
+
+        .titlebar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .titlebar-logo {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .titlebar-title {
+            font-family: var(--font-display);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            color: #C8CCD6;
+        }
+
+        .titlebar-title span {
+            color: var(--accent-orange);
+        }
+
+        .titlebar-controls {
+            display: flex;
+            align-items: center;
+            -webkit-app-region: no-drag;
+        }
+
+        .win-btn {
+            width: 38px;
+            height: 37px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .win-btn:hover {
+            background: #1C1E23;
+            color: #FFFFFF;
+        }
+
+        .win-btn.close:hover {
+            background: #D64242;
+            color: #FFFFFF;
+        }
+
+        /* MAIN SETTINGS CONTAINER */
+        .app-workspace {
+            flex: 1;
+            display: flex;
+            background: var(--bg-settings);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 230px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-main);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sidebar-brand {
+            padding: 18px 20px 14px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .brand-heading {
+            font-family: var(--font-display);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #FFFFFF;
+        }
+
+        .brand-sub {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-menu {
+            padding: 14px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .menu-tab {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 3px;
+            font-family: var(--font-display);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-tab svg {
+            color: var(--text-muted);
+            transition: color 0.15s ease;
+            flex-shrink: 0;
+        }
+
+        .menu-tab:hover {
+            background: #18191E;
+            color: #FFFFFF;
+        }
+
+        .menu-tab:hover svg {
+            color: #FFFFFF;
+        }
+
+        .menu-tab.active {
+            background: #1B1D23;
+            color: #FFFFFF;
+            border-left-color: var(--accent-orange);
+        }
+
+        .menu-tab.active svg {
+            color: var(--accent-orange);
+        }
+
+        .sidebar-footer {
+            padding: 14px 18px;
+            border-top: 1px solid var(--border-subtle);
+            background: var(--bg-sidebar);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .status-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .status-badge-wrap {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .online-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--status-green);
+            box-shadow: 0 0 6px var(--status-green);
+        }
+
+        .ver-tag {
+            font-family: var(--font-display);
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--accent-orange);
+            background: rgba(255, 85, 0, 0.1);
+            border: 1px solid rgba(255, 85, 0, 0.25);
+            padding: 1px 6px;
+            border-radius: 2px;
+        }
+
+        .lang-switch-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            padding-top: 4px;
+            border-top: 1px solid #181A20;
+        }
+
+        .lang-btn-group {
+            display: flex;
+            gap: 4px;
+        }
+
+        .lang-btn {
+            font-family: var(--font-display);
+            font-size: 10px;
+            font-weight: 700;
+            background: transparent;
+            border: 1px solid #202229;
+            color: var(--text-secondary);
+            padding: 1px 6px;
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .lang-btn.active {
+            background: var(--accent-orange);
+            border-color: var(--accent-orange);
+            color: #FFFFFF;
+        }
+
+        /* MAIN CONTENT AREA */
+        .content-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: var(--bg-settings);
+        }
+
+        .content-topbar {
+            height: 56px;
+            padding: 0 26px;
+            border-bottom: 1px solid var(--border-main);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            background: var(--bg-settings);
+        }
+
+        .section-headline {
+            font-family: var(--font-display);
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            color: #FFFFFF;
+        }
+
+        .content-view {
+            flex: 1;
+            overflow-y: auto;
+            padding: 22px 26px 30px;
+        }
+
+        .view-tab {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .view-tab.active {
+            display: flex;
+        }
+
+        .view-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            margin-top: -4px;
+            margin-bottom: 4px;
+        }
+
+        /* NOTIFICATION BANNER */
+        .notification-card {
+            background: #0E0F12;
+            border: 1px solid var(--border-main);
+            border-left: 3px solid var(--accent-orange);
+            border-radius: 2px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* CARDS */
+        .card-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-main);
+            border-radius: 3px;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .card-caption {
+            font-family: var(--font-display);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-caption svg {
+            color: var(--accent-orange);
+        }
+
+        /* INPUT ROW */
+        .input-inline {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .input-field-wrap {
+            position: relative;
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-field-wrap svg {
+            position: absolute;
+            left: 12px;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border-main);
+            color: #FFFFFF;
+            padding: 8px 12px 8px 34px;
+            border-radius: 2px;
+            font-size: 12px;
+            outline: none;
+            transition: all 0.15s ease;
+            user-select: text;
+            -webkit-user-select: text;
+        }
+
+        input[type="text"]::placeholder {
+            color: var(--text-muted);
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 1px var(--border-focus);
+        }
+
+        /* BUTTONS */
+        .btn {
+            font-family: var(--font-display);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            height: 32px;
+            padding: 0 12px;
+            border-radius: 2px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: 1px solid transparent;
+            outline: none;
+            white-space: nowrap;
+        }
+
+        .btn-orange {
+            background: var(--accent-orange);
+            color: #FFFFFF;
+        }
+
+        .btn-orange:hover {
+            background: var(--accent-orange-hover);
+            box-shadow: 0 0 10px var(--accent-orange-glow);
+        }
+
+        .btn-orange:active {
+            background: var(--accent-orange-dark);
+        }
+
+        .btn-dark {
+            background: #18191E;
+            border-color: var(--border-main);
+            color: #FFFFFF;
+        }
+
+        .btn-dark:hover {
+            background: #202228;
+            border-color: #2F323C;
+        }
+
+        /* EXTENSION ROW */
+        .ext-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-main);
+            border-radius: 3px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            transition: all 0.15s ease;
+        }
+
+        .ext-item:hover {
+            background: var(--bg-card-hover);
+            border-color: #282A33;
+        }
+
+        .ext-item.disabled {
+            opacity: 0.6;
+        }
+
+        .ext-data {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .ext-icon-shell {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            padding: 6px;
+        }
+
+        .ext-icon-shell img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .ext-details {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            min-width: 0;
+        }
+
+        .ext-header-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ext-name {
+            font-family: var(--font-display);
+            font-size: 13px;
+            font-weight: 700;
+            color: #FFFFFF;
+            letter-spacing: 0.3px;
+        }
+
+        .ext-ver {
+            font-family: var(--font-display);
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            padding: 1px 5px;
+            border-radius: 2px;
+        }
+
+        .ext-summary {
+            font-size: 11px;
+            color: var(--text-secondary);
+            line-height: 1.35;
+            max-width: 520px;
+        }
+
+        .ext-tools {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .tool-btn {
+            font-family: var(--font-display);
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            height: 28px;
+            padding: 0 9px;
+            border-radius: 2px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-main);
+            color: var(--text-secondary);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .tool-btn:hover:not(:disabled) {
+            background: #1C1E24;
+            color: #FFFFFF;
+            border-color: #2F323D;
+        }
+
+        .tool-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* TOGGLE */
+        .toggle-switch {
+            width: 40px;
+            height: 20px;
+            background: #23252C;
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #2F323C;
+            flex-shrink: 0;
+        }
+
+        .toggle-knob {
+            width: 14px;
+            height: 14px;
+            background: #8E92A0;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .toggle-switch.active {
+            background: var(--accent-orange);
+            border-color: var(--accent-orange);
+            box-shadow: 0 0 8px var(--accent-orange-glow);
+        }
+
+        .toggle-switch.active .toggle-knob {
+            transform: translateX(20px);
+            background: #FFFFFF;
+        }
+
+        /* SETTINGS ROWS */
+        .option-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .option-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .option-row:first-child {
+            padding-top: 0;
+        }
+
+        .option-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            max-width: 520px;
+        }
+
+        .option-title {
+            font-family: var(--font-display);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            color: #FFFFFF;
+        }
+
+        .option-text {
+            font-size: 11px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .badge-active {
+            font-family: var(--font-display);
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--status-green);
+            background: rgba(0, 179, 89, 0.1);
+            border: 1px solid rgba(0, 179, 89, 0.25);
+            padding: 2px 7px;
+            border-radius: 2px;
+            letter-spacing: 0.5px;
+        }
+
+        .msg-container {
+            font-size: 11px;
+            padding: 6px 10px;
+            border-radius: 2px;
+            display: none;
+            margin-top: 2px;
+        }
+        .msg-container.success { display: block; background: rgba(0, 179, 89, 0.08); color: var(--status-green); border: 1px solid rgba(0, 179, 89, 0.25); }
+        .msg-container.error { display: block; background: rgba(214, 66, 66, 0.08); color: #FF6666; border: 1px solid rgba(214, 66, 66, 0.25); }
+        .msg-container.info { display: block; background: #0E0F12; color: var(--text-secondary); border: 1px solid var(--border-main); }
+
+        .key-badge {
+            font-family: var(--font-display);
+            font-size: 10px;
+            font-weight: 700;
+            background: #121212;
+            border: 1px solid var(--border-main);
+            color: #FFFFFF;
+            padding: 2px 6px;
+            border-radius: 2px;
+            letter-spacing: 0.4px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TITLEBAR -->
+    <div class="titlebar">
+        <div class="titlebar-left">
+            <div class="titlebar-logo">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none">
+                    <polygon points="3,3 21,3 15.5,12 21,21 3,21 8.5,12" fill="#FF5500"/>
+                </svg>
+            </div>
+            <div class="titlebar-title">FACEIT <span>EXTENSIONS</span></div>
+        </div>
+        <div class="titlebar-controls">
+            <button class="win-btn" id="win-min-btn" title="Свернуть">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            </button>
+            <button class="win-btn close" id="win-close-btn" title="Закрыть">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN APP INTERFACE -->
+    <div class="app-workspace">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-heading" id="i18n-brand-heading">НАСТРОЙКИ</div>
+                <div class="brand-sub">Faceit Extensions</div>
+            </div>
+
+            <div class="sidebar-menu">
+                <div class="menu-tab active" data-tab="tab-ext">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5C13 2.12 11.88 1 10.5 1S8 2.12 8 3.5V5H4c-1.1 0-1.99.9-1.99 2v3.8H3.5c1.49 0 2.7 1.21 2.7 2.7s-1.21 2.7-2.7 2.7H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.49 1.21-2.7 2.7-2.7 1.49 0 2.7 1.21 2.7 2.7V22H17c1.1 0 2-.9 2-2v-4h1.5c1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5z"/></svg>
+                    <span id="i18n-tab-ext">Расширения</span>
+                </div>
+                <div class="menu-tab" data-tab="tab-perf">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M13 2L3 14h7v8l11-12h-8z"/></svg>
+                    <span id="i18n-tab-perf">Производительность</span>
+                </div>
+                <div class="menu-tab" data-tab="tab-scale">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                    <span id="i18n-tab-scale">Масштаб</span>
+                </div>
+                <div class="menu-tab" data-tab="tab-info">
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    <span id="i18n-tab-info">О программе</span>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="status-row">
+                    <div class="status-badge-wrap">
+                        <div class="online-dot"></div>
+                        <span id="i18n-client-hook">Клиент FACEIT</span>
+                    </div>
+                    <span class="ver-tag">v1.0.0</span>
+                </div>
+                <div class="lang-switch-row">
+                    <span id="i18n-lang-label">Язык</span>
+                    <div class="lang-btn-group">
+                        <button class="lang-btn active" id="btn-lang-ru">RU</button>
+                        <button class="lang-btn" id="btn-lang-en">EN</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="content-panel">
+            <div class="content-topbar">
+                <div class="section-headline" id="active-title">РАСШИРЕНИЯ</div>
+                <button class="btn btn-dark" id="btn-restart-app">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10"/></svg>
+                    <span id="i18n-btn-restart">ПЕРЕЗАПУСК КЛИЕНТА</span>
+                </button>
+            </div>
+
+            <div class="content-view">
+
+                <div id="restart-notice" class="notification-card" style="display: none; margin-bottom: 16px;">
+                    <span id="i18n-restart-notice">Настройки изменены. Перезапустите клиент для вступления в силу.</span>
+                    <button class="btn btn-orange" id="btn-notice-restart">
+                        <span id="i18n-btn-notice-restart">ПЕРЕЗАПУСТИТЬ</span>
+                    </button>
+                </div>
+
+                <div id="update-notice" class="notification-card" style="display: none; margin-bottom: 16px;">
+                    <span id="update-notice-text">Доступно обновление Faceit Extensions!</span>
+                    <button class="btn btn-orange" id="btn-do-update">
+                        <span id="i18n-btn-do-update">ОБНОВИТЬ</span>
+                    </button>
+                </div>
+
+                <!-- TAB 1: EXTENSIONS -->
+                <div class="view-tab active" id="tab-ext">
+                    <div class="view-desc" id="i18n-ext-desc">Управление дополнениями внутри клиента FACEIT</div>
+
+                    <div class="card-box">
+                        <div class="card-caption">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            <span id="i18n-install-title">Установка расширения</span>
+                        </div>
+                        <div class="input-inline">
+                            <div class="input-field-wrap">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                                <input type="text" id="install-input" placeholder="Ссылка из магазина Chrome или ID расширения">
+                            </div>
+                            <button class="btn btn-orange" id="btn-install">
+                                <span id="i18n-btn-install">УСТАНОВИТЬ</span>
+                            </button>
+                        </div>
+                        <div id="install-msg" class="msg-container"></div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px;">
+                        <span style="font-family: var(--font-display); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #FFFFFF;">
+                            <span id="i18n-installed-title">Установленные дополнения</span> (<span id="ext-counter">0</span>)
+                        </span>
+                        <button class="btn btn-dark" id="btn-folder" style="height: 26px; font-size: 10px; padding: 0 8px;">
+                            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                            <span id="i18n-btn-folder">ПАПКА РАСШИРЕНИЙ</span>
+                        </button>
+                    </div>
+
+                    <div id="extensions-container" style="display: flex; flex-direction: column; gap: 8px;">
+                        <!-- Extension items -->
+                    </div>
+                </div>
+
+                <!-- TAB 2: PERFORMANCE -->
+                <div class="view-tab" id="tab-perf">
+                    <div class="view-desc" id="i18n-perf-desc">Настройки видеокарты и оперативной памяти для Counter Strike</div>
+
+                    <div class="card-box">
+                        <div class="option-row">
+                            <div class="option-meta">
+                                <span class="option-title" id="i18n-perf-gpu-title">Аппаратное ускорение GPU</span>
+                                <span class="option-text" id="i18n-perf-gpu-desc">Рендеринг интерфейса через видеокарту для снижения нагрузки на процессор</span>
+                            </div>
+                            <div class="toggle-switch active" id="perf-switch">
+                                <div class="toggle-knob"></div>
+                            </div>
+                        </div>
+
+                        <div class="option-row">
+                            <div class="option-meta">
+                                <span class="option-title" id="i18n-perf-v8-title">Очистка памяти V8</span>
+                                <span class="option-text" id="i18n-perf-v8-desc">Сброс кэша оперативной памяти при переключении на окно игры</span>
+                            </div>
+                            <span class="badge-active" id="i18n-badge-v8">АКТИВНО</span>
+                        </div>
+
+                        <div class="option-row">
+                            <div class="option-meta">
+                                <span class="option-title" id="i18n-perf-debloat-title">Отключение телеметрии</span>
+                                <span class="option-text" id="i18n-perf-debloat-desc">Блокировка отправки фоновой аналитики и отчетов об ошибках</span>
+                            </div>
+                            <span class="badge-active" id="i18n-badge-debloat">АКТИВНО</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: SCALE -->
+                <div class="view-tab" id="tab-scale">
+                    <div class="view-desc" id="i18n-scale-desc">Размер интерфейса клиента FACEIT и быстрые клавиши</div>
+
+                    <div class="card-box">
+                        <div class="option-row">
+                            <div class="option-meta">
+                                <span class="option-title" id="i18n-scale-title">Масштаб интерфейса</span>
+                                <span class="option-text"><span id="i18n-scale-current">Текущий масштаб</span> <b id="zoom-val" style="color: var(--accent-orange);">95%</b></span>
+                            </div>
+                            <div style="display: flex; gap: 6px; align-items: center;">
+                                <button class="btn btn-dark" id="btn-scale-down" style="padding: 0 10px;">
+                                    <span id="i18n-btn-scale-down">МЕНЬШЕ</span>
+                                </button>
+                                <button class="btn btn-dark" id="btn-scale-reset" style="padding: 0 12px;">100%</button>
+                                <button class="btn btn-dark" id="btn-scale-up" style="padding: 0 10px;">
+                                    <span id="i18n-btn-scale-up">БОЛЬШЕ</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-box">
+                        <div class="card-caption" id="i18n-shortcuts-title">Горячие клавиши</div>
+                        <div class="option-row">
+                            <span class="option-text" id="i18n-shortcut-open">Открыть окно расширений</span>
+                            <div style="display: flex; gap: 4px;">
+                                <span class="key-badge">CTRL</span>
+                                <span class="key-badge">SHIFT</span>
+                                <span class="key-badge">E</span>
+                            </div>
+                        </div>
+                        <div class="option-row">
+                            <span class="option-text" id="i18n-shortcut-scale">Масштаб колесом мыши</span>
+                            <div style="display: flex; gap: 4px;">
+                                <span class="key-badge">CTRL</span>
+                                <span class="key-badge">WHEEL</span>
+                            </div>
+                        </div>
+                        <div class="option-row">
+                            <span class="option-text" id="i18n-shortcut-dev">Консоль разработчика</span>
+                            <span class="key-badge">F12</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: ABOUT -->
+                <div class="view-tab" id="tab-info">
+                    <div class="view-desc" id="i18n-info-desc">Сведения о сборке Faceit Extensions</div>
+
+                    <div class="card-box">
+                        <div class="option-row">
+                            <div class="option-meta">
+                                <span class="option-title" id="i18n-info-ver-title">Версия приложения</span>
+                                <span class="option-text" id="i18n-info-ver-desc">Модуль расширений для настольного клиента FACEIT</span>
+                            </div>
+                            <span class="ver-tag">v1.0.0</span>
+                        </div>
+
+                        <div class="option-row">
+                            <div class="option-meta">
+                                <span class="option-title" id="i18n-update-title">Обновления</span>
+                                <span class="option-text" id="i18n-update-desc">Проверка наличия обновлений расширений</span>
+                            </div>
+                            <button class="btn btn-dark" id="btn-check-update">
+                                <span id="i18n-btn-check-update">ПРОВЕРИТЬ</span>
+                            </button>
+                        </div>
+
+                        <div class="option-row">
+                            <div class="option-meta">
+                                <span class="option-title" id="i18n-info-dir-title">Каталог файлов</span>
+                                <span class="option-text" id="i18n-info-dir-desc">Директория с файлами и манифестами расширений</span>
+                            </div>
+                            <button class="btn btn-dark" id="btn-info-folder">
+                                <span id="i18n-btn-open-dir">ОТКРЫТЬ ПАПКУ</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DICTIONARY
+        const I18N = {
+            ru: {
+                brandHeading: 'НАСТРОЙКИ',
+                tabExt: 'Расширения',
+                tabPerf: 'Производительность',
+                tabScale: 'Масштаб',
+                tabInfo: 'О программе',
+                clientHook: 'Клиент FACEIT',
+                langLabel: 'Язык',
+                titleExt: 'РАСШИРЕНИЯ',
+                titlePerf: 'ПРОИЗВОДИТЕЛЬНОСТЬ',
+                titleScale: 'МАСШТАБ',
+                titleInfo: 'О ПРОГРАММЕ',
+                btnRestart: 'ПЕРЕЗАПУСК КЛИЕНТА',
+                restartNotice: 'Настройки изменены. Перезапустите клиент для вступления в силу.',
+                btnRestartNotice: 'ПЕРЕЗАПУСТИТЬ',
+                extDesc: 'Управление дополнениями внутри клиента FACEIT',
+                installTitle: 'Установка расширения',
+                installPlaceholder: 'Ссылка из магазина Chrome или ID расширения',
+                btnInstall: 'УСТАНОВИТЬ',
+                installedTitle: 'Установленные дополнения',
+                btnFolder: 'ПАПКА РАСШИРЕНИЙ',
+                noExt: 'Нет установленных дополнений. Вставьте ссылку выше для установки.',
+                toolSettings: 'НАСТРОЙКИ',
+                toolPopup: 'ОКНО',
+                toolFiles: 'ФАЙЛЫ',
+                perfDesc: 'Настройки видеокарты и оперативной памяти для Counter Strike',
+                perfGpuTitle: 'Аппаратное ускорение GPU',
+                perfGpuDesc: 'Рендеринг интерфейса через видеокарту для снижения нагрузки на процессор',
+                perfV8Title: 'Очистка памяти V8',
+                perfV8Desc: 'Сброс кэша оперативной памяти при переключении на окно игры',
+                perfDebloatTitle: 'Отключение телеметрии',
+                perfDebloatDesc: 'Блокировка отправки фоновой аналитики и отчетов об ошибках',
+                badgeActive: 'АКТИВНО',
+                scaleDesc: 'Размер интерфейса клиента FACEIT и быстрые клавиши',
+                scaleTitle: 'Масштаб интерфейса',
+                scaleCurrent: 'Текущий масштаб',
+                btnScaleDown: 'МЕНЬШЕ',
+                btnScaleUp: 'БОЛЬШЕ',
+                shortcutsTitle: 'Горячие клавиши',
+                shortcutOpen: 'Открыть окно расширений',
+                shortcutScale: 'Масштаб колесом мыши',
+                shortcutDev: 'Консоль разработчика',
+                infoDesc: 'Сведения о сборке Faceit Extensions',
+                infoVerTitle: 'Версия приложения',
+                infoVerDesc: 'Модуль расширений для настольного клиента FACEIT',
+                infoDirTitle: 'Каталог файлов',
+                infoDirDesc: 'Директория с файлами и манифестами расширений',
+                btnOpenDir: 'ОТКРЫТЬ ПАПКУ',
+                updateTitle: 'Обновления',
+                updateDesc: 'Проверка наличия обновлений расширений',
+                btnCheckUpdate: 'ПРОВЕРИТЬ',
+                btnDoUpdate: 'ОБНОВИТЬ',
+                updateNotice: (v) => `Доступно обновление Faceit Extensions v${v}!`,
+                updateChecking: 'ПРОВЕРКА...',
+                updateLatest: 'У вас последняя версия',
+                updateDownloading: 'ЗАГРУЗКА...',
+                updateDone: 'Обновлено успешно. Перезапуск клиента...',
+                updateErr: (err) => `Ошибка обновления: ${err}`,
+                msgInstalling: 'Загрузка и установка дополнения, пожалуйста подождите...',
+                msgSuccess: (name) => `Дополнение "${name}" успешно установлено. Перезапустите клиент.`,
+                msgMockSuccess: 'Дополнение успешно зарегистрировано в системе.',
+                msgError: (err) => `Ошибка установки: ${err}`,
+                btnMin: 'Свернуть',
+                btnClose: 'Закрыть',
+                toggleOn: 'Выключить',
+                toggleOff: 'Включить',
+                counterText: (active, total) => `${active} активно / ${total} всего`,
+                restartTime: 'ПЕРЕЗАПУСК...',
+                restartConfirm: 'Перезапустить клиент FACEIT сейчас?'
+            },
+            en: {
+                brandHeading: 'SETTINGS',
+                tabExt: 'Extensions',
+                tabPerf: 'Performance',
+                tabScale: 'Interface Scale',
+                tabInfo: 'About',
+                clientHook: 'FACEIT Client',
+                langLabel: 'Language',
+                titleExt: 'EXTENSIONS',
+                titlePerf: 'PERFORMANCE',
+                titleScale: 'INTERFACE SCALE',
+                titleInfo: 'ABOUT',
+                btnRestart: 'RESTART CLIENT',
+                restartNotice: 'Settings modified. Restart FACEIT client to apply changes.',
+                btnRestartNotice: 'RESTART NOW',
+                extDesc: 'Manage installed extensions inside FACEIT client',
+                installTitle: 'Install Extension',
+                installPlaceholder: 'Chrome Web Store URL or extension ID',
+                btnInstall: 'INSTALL',
+                installedTitle: 'Installed Extensions',
+                btnFolder: 'EXTENSIONS FOLDER',
+                noExt: 'No extensions installed. Paste a link or ID above to install.',
+                toolSettings: 'SETTINGS',
+                toolPopup: 'POPUP',
+                toolFiles: 'FILES',
+                perfDesc: 'GPU acceleration and memory settings for Counter Strike',
+                perfGpuTitle: 'Hardware GPU Acceleration',
+                perfGpuDesc: 'Render interface using dedicated GPU to eliminate idle CPU load',
+                perfV8Title: 'V8 Memory Auto Purge',
+                perfV8Desc: 'Flushes unused JavaScript heap memory when switching to game',
+                perfDebloatTitle: 'Telemetry Debloat',
+                perfDebloatDesc: 'Blocks telemetry trackers and error reporters for smoother gameplay',
+                badgeActive: 'ACTIVE',
+                scaleDesc: 'Client resolution scaling and keyboard shortcuts',
+                scaleTitle: 'Interface Scale',
+                scaleCurrent: 'Current scale',
+                btnScaleDown: 'ZOOM OUT',
+                btnScaleUp: 'ZOOM IN',
+                shortcutsTitle: 'Shortcuts',
+                shortcutOpen: 'Open extensions settings',
+                shortcutScale: 'Scale with mouse wheel',
+                shortcutDev: 'Developer console',
+                infoDesc: 'Faceit Extensions build details',
+                infoVerTitle: 'App Version',
+                infoVerDesc: 'Extensions module for FACEIT desktop client',
+                infoDirTitle: 'Files Directory',
+                infoDirDesc: 'Folder containing manifests and runtime files',
+                btnOpenDir: 'OPEN FOLDER',
+                updateTitle: 'Updates',
+                updateDesc: 'Check for extension and client updates',
+                btnCheckUpdate: 'CHECK FOR UPDATES',
+                btnDoUpdate: 'UPDATE',
+                updateNotice: (v) => `Faceit Extensions v${v} is available!`,
+                updateChecking: 'CHECKING...',
+                updateLatest: 'Up to date',
+                updateDownloading: 'DOWNLOADING...',
+                updateDone: 'Updated successfully. Restarting client...',
+                updateErr: (err) => `Update error: ${err}`,
+                msgInstalling: 'Downloading and deploying extension, please wait...',
+                msgSuccess: (name) => `Extension "${name}" successfully installed. Restart client.`,
+                msgMockSuccess: 'Extension registered successfully in preview.',
+                msgError: (err) => `Installation error: ${err}`,
+                btnMin: 'Minimize',
+                btnClose: 'Close',
+                toggleOn: 'Disable',
+                toggleOff: 'Enable',
+                counterText: (active, total) => `${active} active / ${total} total`,
+                restartTime: 'RESTARTING...',
+                restartConfirm: 'Restart FACEIT Client now?'
+            }
+        };
+
+        let currentLang = 'ru';
+
+        async function detectLanguage() {
+            let loc = '';
+            if (window.extAPI && window.extAPI.getLocale) {
+                try {
+                    loc = await window.extAPI.getLocale();
+                } catch (_) {}
+            }
+            if (!loc) {
+                loc = navigator.language || navigator.userLanguage || '';
+            }
+            return loc.toLowerCase().startsWith('ru') ? 'ru' : 'en';
+        }
+
+        function applyLanguage(lang) {
+            currentLang = lang;
+            const t = I18N[lang] || I18N.ru;
+
+            document.getElementById('i18n-brand-heading').textContent = t.brandHeading;
+            document.getElementById('i18n-tab-ext').textContent = t.tabExt;
+            document.getElementById('i18n-tab-perf').textContent = t.tabPerf;
+            document.getElementById('i18n-tab-scale').textContent = t.tabScale;
+            document.getElementById('i18n-tab-info').textContent = t.tabInfo;
+            document.getElementById('i18n-client-hook').textContent = t.clientHook;
+            document.getElementById('i18n-lang-label').textContent = t.langLabel;
+            document.getElementById('i18n-btn-restart').textContent = t.btnRestart;
+            document.getElementById('i18n-restart-notice').textContent = t.restartNotice;
+            document.getElementById('i18n-btn-notice-restart').textContent = t.btnRestartNotice;
+            document.getElementById('i18n-ext-desc').textContent = t.extDesc;
+            document.getElementById('i18n-install-title').textContent = t.installTitle;
+            document.getElementById('install-input').placeholder = t.installPlaceholder;
+            document.getElementById('i18n-btn-install').textContent = t.btnInstall;
+            document.getElementById('i18n-installed-title').textContent = t.installedTitle;
+            document.getElementById('i18n-btn-folder').textContent = t.btnFolder;
+
+            document.getElementById('i18n-perf-desc').textContent = t.perfDesc;
+            document.getElementById('i18n-perf-gpu-title').textContent = t.perfGpuTitle;
+            document.getElementById('i18n-perf-gpu-desc').textContent = t.perfGpuDesc;
+            document.getElementById('i18n-perf-v8-title').textContent = t.perfV8Title;
+            document.getElementById('i18n-perf-v8-desc').textContent = t.perfV8Desc;
+            document.getElementById('i18n-perf-debloat-title').textContent = t.perfDebloatTitle;
+            document.getElementById('i18n-perf-debloat-desc').textContent = t.perfDebloatDesc;
+            document.getElementById('i18n-badge-v8').textContent = t.badgeActive;
+            document.getElementById('i18n-badge-debloat').textContent = t.badgeActive;
+
+            document.getElementById('i18n-scale-desc').textContent = t.scaleDesc;
+            document.getElementById('i18n-scale-title').textContent = t.scaleTitle;
+            document.getElementById('i18n-scale-current').textContent = t.scaleCurrent;
+            document.getElementById('i18n-btn-scale-down').textContent = t.btnScaleDown;
+            document.getElementById('i18n-btn-scale-up').textContent = t.btnScaleUp;
+            document.getElementById('i18n-shortcuts-title').textContent = t.shortcutsTitle;
+            document.getElementById('i18n-shortcut-open').textContent = t.shortcutOpen;
+            document.getElementById('i18n-shortcut-scale').textContent = t.shortcutScale;
+            document.getElementById('i18n-shortcut-dev').textContent = t.shortcutDev;
+
+            document.getElementById('i18n-info-desc').textContent = t.infoDesc;
+            document.getElementById('i18n-info-ver-title').textContent = t.infoVerTitle;
+            document.getElementById('i18n-info-ver-desc').textContent = t.infoVerDesc;
+            document.getElementById('i18n-info-dir-title').textContent = t.infoDirTitle;
+            document.getElementById('i18n-info-dir-desc').textContent = t.infoDirDesc;
+            document.getElementById('i18n-btn-open-dir').textContent = t.btnOpenDir;
+
+            if (document.getElementById('i18n-update-title')) document.getElementById('i18n-update-title').textContent = t.updateTitle;
+            if (document.getElementById('i18n-update-desc')) document.getElementById('i18n-update-desc').textContent = t.updateDesc;
+            if (document.getElementById('i18n-btn-check-update')) document.getElementById('i18n-btn-check-update').textContent = t.btnCheckUpdate;
+            if (document.getElementById('i18n-btn-do-update')) document.getElementById('i18n-btn-do-update').textContent = t.btnDoUpdate;
+
+            document.getElementById('win-min-btn').title = t.btnMin;
+            document.getElementById('win-close-btn').title = t.btnClose;
+
+            // Update active tab title
+            const activeTab = document.querySelector('.menu-tab.active');
+            if (activeTab) {
+                const target = activeTab.getAttribute('data-tab');
+                updateTabHeadline(target);
+            }
+
+            // Sync language switch buttons
+            document.getElementById('btn-lang-ru').classList.toggle('active', lang === 'ru');
+            document.getElementById('btn-lang-en').classList.toggle('active', lang === 'en');
+
+            renderExtensions();
+        }
+
+        function updateTabHeadline(tabId) {
+            const t = I18N[currentLang] || I18N.ru;
+            const headlines = {
+                'tab-ext': t.titleExt,
+                'tab-perf': t.titlePerf,
+                'tab-scale': t.titleScale,
+                'tab-info': t.titleInfo
+            };
+            if (headlines[tabId]) {
+                document.getElementById('active-title').textContent = headlines[tabId];
+            }
+        }
+
+        // NAVIGATION
+        const menuTabs = document.querySelectorAll('.menu-tab');
+        const viewTabs = document.querySelectorAll('.view-tab');
+
+        menuTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = tab.getAttribute('data-tab');
+                menuTabs.forEach(t => t.classList.remove('active'));
+                viewTabs.forEach(v => v.classList.remove('active'));
+
+                tab.classList.add('active');
+                const panel = document.getElementById(target);
+                if (panel) panel.classList.add('active');
+
+                updateTabHeadline(target);
+            });
+        });
+
+        // LANGUAGE BUTTONS
+        document.getElementById('btn-lang-ru').addEventListener('click', () => applyLanguage('ru'));
+        document.getElementById('btn-lang-en').addEventListener('click', () => applyLanguage('en'));
+
+        // WINDOW CONTROLS
+        document.getElementById('win-close-btn').addEventListener('click', () => {
+            if (window.extAPI && window.extAPI.closeWindow) {
+                window.extAPI.closeWindow();
+            } else {
+                window.close();
+            }
+        });
+
+        document.getElementById('win-min-btn').addEventListener('click', () => {
+            if (window.extAPI && window.extAPI.minimizeWindow) {
+                window.extAPI.minimizeWindow();
+            }
+        });
+
+        // EXTENSIONS DATA & LOGIC
+        const extContainer = document.getElementById('extensions-container');
+        const extCounter = document.getElementById('ext-counter');
+        const installInput = document.getElementById('install-input');
+        const btnInstall = document.getElementById('btn-install');
+        const installMsg = document.getElementById('install-msg');
+        const btnFolder = document.getElementById('btn-folder');
+        const btnInfoFolder = document.getElementById('btn-info-folder');
+        const btnRestartApp = document.getElementById('btn-restart-app');
+        const restartNotice = document.getElementById('restart-notice');
+
+        const MOCK_DATA = [
+            {
+                id: 'repeek',
+                name: 'Repeek (FACEIT Enhancer)',
+                version: '2.4.1',
+                description: 'Статистика игроков, история матчей, расчет ELO и автоматическое принятие игры в матче',
+                descriptionEn: 'Extended player statistics, match history, ELO predictions and match acceptance in lobby',
+                folder: 'repeek',
+                enabled: true,
+                hasOptions: true,
+                hasPopup: true,
+                iconDataUrl: null
+            },
+            {
+                id: 'cpjienndjbobchlaklajagacpiepclek',
+                name: 'Faceit UI Cleaner',
+                version: '1.2.0',
+                description: 'Скрытие рекламных блоков и лишних баннеров в интерфейсе клиента',
+                descriptionEn: 'Cleans up promotional banners and removes redundant UI sections in client',
+                folder: 'cpjienndjbobchlaklajagacpiepclek',
+                enabled: true,
+                hasOptions: true,
+                hasPopup: false,
+                iconDataUrl: null
+            },
+            {
+                id: 'kodlabmmaalpolkfolgpahbjehalecki',
+                name: 'VisusGG Match Analytics',
+                version: '1.0.8',
+                description: 'Детальная аналитика матчей, статистика карт и винрейт соперников',
+                descriptionEn: 'Deep match analytics, map records and win rates for active rosters',
+                folder: 'kodlabmmaalpolkfolgpahbjehalecki',
+                enabled: false,
+                hasOptions: false,
+                hasPopup: true,
+                iconDataUrl: null
+            }
+        ];
+
+        const faceitMark = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"><polygon points="3,3 21,3 15.5,12 21,21 3,21 8.5,12" fill="#FF5500"/></svg>`;
+
+        async function renderExtensions() {
+            const t = I18N[currentLang] || I18N.ru;
+            try {
+                let list;
+                if (window.extAPI && window.extAPI.getExtensions) {
+                    list = await window.extAPI.getExtensions();
+                } else {
+                    list = MOCK_DATA;
+                }
+
+                extCounter.textContent = t.counterText(list.filter(e => e.enabled).length, list.length);
+
+                if (!list || list.length === 0) {
+                    extContainer.innerHTML = `<div style="text-align:center;padding:26px;color:var(--text-muted);font-size:12px;background:var(--bg-card);border:1px solid var(--border-main);border-radius:2px;">${t.noExt}</div>`;
+                    return;
+                }
+
+                extContainer.innerHTML = '';
+                list.forEach(ext => {
+                    const row = document.createElement('div');
+                    row.className = `ext-item ${ext.enabled ? '' : 'disabled'}`;
+
+                    let iconEl;
+                    if (ext.iconDataUrl) {
+                        iconEl = `<img src="${ext.iconDataUrl}" alt="${ext.name}" onerror="this.outerHTML='${faceitMark.replace(/"/g, '&quot;')}'">`;
+                    } else {
+                        iconEl = faceitMark;
+                    }
+
+                    let btns = '';
+                    if (ext.hasOptions) {
+                        btns += `<button class="tool-btn" data-id="${ext.id}" data-type="options" ${ext.enabled ? '' : 'disabled'}>${t.toolSettings}</button>`;
+                    }
+                    if (ext.hasPopup) {
+                        btns += `<button class="tool-btn" data-id="${ext.id}" data-type="popup" ${ext.enabled ? '' : 'disabled'}>${t.toolPopup}</button>`;
+                    }
+                    btns += `<button class="tool-btn" data-folder="${ext.folder}" data-type="folder">${t.toolFiles}</button>`;
+
+                    btns += `
+                        <div class="toggle-switch ${ext.enabled ? 'active' : ''}" data-folder="${ext.folder}" data-enabled="${ext.enabled}" data-type="toggle" title="${ext.enabled ? t.toggleOn : t.toggleOff}">
+                            <div class="toggle-knob"></div>
+                        </div>
+                    `;
+
+                    const desc = (currentLang === 'en' && ext.descriptionEn) ? ext.descriptionEn : (ext.description || '');
+
+                    row.innerHTML = `
+                        <div class="ext-data">
+                            <div class="ext-icon-shell">
+                                ${iconEl}
+                            </div>
+                            <div class="ext-details">
+                                <div class="ext-header-line">
+                                    <span class="ext-name">${ext.name}</span>
+                                    <span class="ext-ver">v${ext.version}</span>
+                                </div>
+                                <div class="ext-summary">${desc}</div>
+                            </div>
+                        </div>
+                        <div class="ext-tools">
+                            ${btns}
+                        </div>
+                    `;
+
+                    extContainer.appendChild(row);
+                });
+
+                extContainer.querySelectorAll('[data-type]').forEach(el => {
+                    el.addEventListener('click', async () => {
+                        const type = el.getAttribute('data-type');
+                        const id = el.getAttribute('data-id');
+                        const folder = el.getAttribute('data-folder');
+
+                        if (type === 'toggle') {
+                            const isCurrent = el.getAttribute('data-enabled') === 'true';
+                            if (window.extAPI && window.extAPI.toggleExtension) {
+                                await window.extAPI.toggleExtension(folder, !isCurrent);
+                                restartNotice.style.display = 'flex';
+                                await renderExtensions();
+                            } else {
+                                const target = MOCK_DATA.find(e => e.folder === folder);
+                                if (target) target.enabled = !isCurrent;
+                                restartNotice.style.display = 'flex';
+                                await renderExtensions();
+                            }
+                        } else if (type === 'options' || type === 'popup') {
+                            if (window.extAPI && window.extAPI.openSettings) {
+                                await window.extAPI.openSettings(id, type);
+                            }
+                        } else if (type === 'folder') {
+                            if (window.extAPI && window.extAPI.openFolder) {
+                                await window.extAPI.openFolder(folder);
+                            }
+                        }
+                    });
+                });
+
+            } catch (err) {
+                extContainer.innerHTML = `<div style="color: #FF5500; font-size: 12px;">Error: ${err.message}</div>`;
+            }
+        }
+
+        const openExtFolder = () => {
+            if (window.extAPI && window.extAPI.openExtensionsDir) {
+                window.extAPI.openExtensionsDir();
+            }
+        };
+
+        btnFolder.addEventListener('click', openExtFolder);
+        btnInfoFolder.addEventListener('click', openExtFolder);
+
+        // CONFIG & GPU PERF
+        let appConfig = { performanceMode: true, zoomFactor: 0.95 };
+        const perfSwitch = document.getElementById('perf-switch');
+        const zoomVal = document.getElementById('zoom-val');
+
+        async function loadConfig() {
+            try {
+                if (window.extAPI && window.extAPI.getConfig) {
+                    appConfig = await window.extAPI.getConfig();
+                }
+                syncConfigUI();
+            } catch (_) {}
+        }
+
+        function syncConfigUI() {
+            if (appConfig.performanceMode) {
+                perfSwitch.classList.add('active');
+            } else {
+                perfSwitch.classList.remove('active');
+            }
+
+            const factor = typeof appConfig.zoomFactor === 'number' ? appConfig.zoomFactor : 0.95;
+            zoomVal.textContent = Math.round(factor * 100) + '%';
+        }
+
+        perfSwitch.addEventListener('click', async () => {
+            const newState = !appConfig.performanceMode;
+            if (window.extAPI && window.extAPI.setConfig) {
+                appConfig = await window.extAPI.setConfig({ performanceMode: newState });
+            } else {
+                appConfig.performanceMode = newState;
+            }
+            syncConfigUI();
+            restartNotice.style.display = 'flex';
+        });
+
+        // ZOOM ACTIONS
+        document.getElementById('btn-scale-down').addEventListener('click', async () => {
+            if (window.extAPI && window.extAPI.setZoom) {
+                const z = await window.extAPI.setZoom(-0.05);
+                appConfig.zoomFactor = z;
+                syncConfigUI();
+            }
+        });
+
+        document.getElementById('btn-scale-up').addEventListener('click', async () => {
+            if (window.extAPI && window.extAPI.setZoom) {
+                const z = await window.extAPI.setZoom(0.05);
+                appConfig.zoomFactor = z;
+                syncConfigUI();
+            }
+        });
+
+        document.getElementById('btn-scale-reset').addEventListener('click', async () => {
+            if (window.extAPI && window.extAPI.resetZoom) {
+                const z = await window.extAPI.resetZoom();
+                appConfig.zoomFactor = z;
+                syncConfigUI();
+            }
+        });
+
+        // RESTART CLIENT
+        async function triggerRestart(btn) {
+            const t = I18N[currentLang] || I18N.ru;
+            try {
+                if (btn) {
+                    btn.disabled = true;
+                    btn.textContent = t.restartTime;
+                }
+                if (window.extAPI && window.extAPI.restartClient) {
+                    await window.extAPI.restartClient();
+                }
+            } catch (_) {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = t.btnRestart;
+                }
+            }
+        }
+
+        btnRestartApp.addEventListener('click', () => {
+            const t = I18N[currentLang] || I18N.ru;
+            if (confirm(t.restartConfirm)) {
+                triggerRestart(btnRestartApp);
+            }
+        });
+
+        document.getElementById('btn-notice-restart').addEventListener('click', () => {
+            triggerRestart(document.getElementById('btn-notice-restart'));
+        });
+
+        // INSTALL EXTENSION
+        btnInstall.addEventListener('click', async () => {
+            const t = I18N[currentLang] || I18N.ru;
+            const val = installInput.value.trim();
+            if (!val) return;
+
+            installMsg.className = 'msg-container info';
+            installMsg.textContent = t.msgInstalling;
+            btnInstall.disabled = true;
+
+            try {
+                if (window.extAPI && window.extAPI.installExtension) {
+                    const res = await window.extAPI.installExtension(val);
+                    if (res.success) {
+                        installMsg.className = 'msg-container success';
+                        installMsg.textContent = t.msgSuccess(res.name);
+                        installInput.value = '';
+                        await renderExtensions();
+                    } else {
+                        installMsg.className = 'msg-container error';
+                        installMsg.textContent = t.msgError(res.error);
+                    }
+                } else {
+                    setTimeout(() => {
+                        installMsg.className = 'msg-container success';
+                        installMsg.textContent = t.msgMockSuccess;
+                    }, 500);
+                }
+            } catch (e) {
+                installMsg.className = 'msg-container error';
+                installMsg.textContent = t.msgError(e.message);
+            } finally {
+                btnInstall.disabled = false;
+            }
+        });
+
+        // UPDATER
+        const btnCheckUpdate = document.getElementById('btn-check-update');
+        const btnDoUpdate = document.getElementById('btn-do-update');
+        const updateNotice = document.getElementById('update-notice');
+        const updateNoticeText = document.getElementById('update-notice-text');
+
+        if (btnCheckUpdate) {
+            btnCheckUpdate.addEventListener('click', async () => {
+                const t = I18N[currentLang] || I18N.ru;
+                btnCheckUpdate.disabled = true;
+                btnCheckUpdate.textContent = t.updateChecking;
+                try {
+                    if (window.extAPI && window.extAPI.checkForUpdates) {
+                        const res = await window.extAPI.checkForUpdates();
+                        if (res && res.updateAvailable) {
+                            updateNoticeText.textContent = t.updateNotice(res.latestVersion);
+                            updateNotice.style.display = 'flex';
+                            btnCheckUpdate.textContent = t.btnDoUpdate;
+                        } else {
+                            btnCheckUpdate.textContent = t.updateLatest;
+                            setTimeout(() => {
+                                btnCheckUpdate.disabled = false;
+                                btnCheckUpdate.textContent = t.btnCheckUpdate;
+                            }, 2500);
+                        }
+                    } else {
+                        setTimeout(() => {
+                            btnCheckUpdate.textContent = t.updateLatest;
+                            setTimeout(() => {
+                                btnCheckUpdate.disabled = false;
+                                btnCheckUpdate.textContent = t.btnCheckUpdate;
+                            }, 2000);
+                        }, 500);
+                    }
+                } catch (err) {
+                    btnCheckUpdate.textContent = t.updateErr(err.message || '');
+                    setTimeout(() => {
+                        btnCheckUpdate.disabled = false;
+                        btnCheckUpdate.textContent = t.btnCheckUpdate;
+                    }, 3000);
+                }
+            });
+        }
+
+        if (btnDoUpdate) {
+            btnDoUpdate.addEventListener('click', async () => {
+                const t = I18N[currentLang] || I18N.ru;
+                btnDoUpdate.disabled = true;
+                btnDoUpdate.textContent = t.updateDownloading;
+                updateNoticeText.textContent = t.updateDownloading;
+                try {
+                    if (window.extAPI && window.extAPI.applyUpdate) {
+                        const res = await window.extAPI.applyUpdate();
+                        if (res && res.success) {
+                            updateNoticeText.textContent = t.updateDone;
+                        } else {
+                            alert(t.updateErr(res?.error || 'Unknown error'));
+                            btnDoUpdate.disabled = false;
+                            btnDoUpdate.textContent = t.btnDoUpdate;
+                        }
+                    }
+                } catch (err) {
+                    alert(t.updateErr(err.message || err));
+                    btnDoUpdate.disabled = false;
+                    btnDoUpdate.textContent = t.btnDoUpdate;
+                }
+            });
+        }
+
+        if (window.extAPI && window.extAPI.onUpdateAvailable) {
+            window.extAPI.onUpdateAvailable((info) => {
+                const t = I18N[currentLang] || I18N.ru;
+                if (info && info.updateAvailable) {
+                    updateNoticeText.textContent = t.updateNotice(info.latestVersion);
+                    updateNotice.style.display = 'flex';
+                }
+            });
+        }
+
+        async function init() {
+            const detectedLang = await detectLanguage();
+            applyLanguage(detectedLang);
+            loadConfig();
+        }
+
+        init();
+    </script>
+</body>
+</html>
